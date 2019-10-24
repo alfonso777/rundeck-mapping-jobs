@@ -19,7 +19,7 @@ def get_job_definition(rundeck_client, job_id):
         "group": job_xml.job.group.text if job_xml.job.find('group') else 'no-group',
         "executionEnabled": job_xml.job.executionEnabled.pyval,
         "scheduleEnabled": job_xml.job.scheduleEnabled.pyval,
-        "schedule": "no-eschedule" if not job_xml.job.find('schedule') else ';'.join([ str(sch.attrib) for sch in job_xml.job.schedule.getchildren()]),
+        "schedule": "no-schedule" if not job_xml.job.find('schedule') else ';'.join([ str(sch.attrib) for sch in job_xml.job.schedule.getchildren()]),
         "steps_strategy": job_xml.job.sequence.get('strategy'),
         "nodefilter": job_xml.job.nodefilters.filter.text.strip() if job_xml.job.find('nodefilters') else 'no-filter'
     }
@@ -81,11 +81,8 @@ def mapping():
     rundeck = Rundeck(api_host, api_token = api_token, version = api_version)
 
     projects = rundeck.list_projects()
-    #projects_jobs = [ (project['name'], rundeck.list_jobs(project['name'])) for project in projects ]
     projects_jobs = { project['name']: rundeck.list_jobs(project['name']) for project in projects }
-    #information_jobs = [ (project_name, get_information_jobs(jobs, rundeck)) for project_name, jobs in projects_jobs ]
     information_jobs = { project_name: get_information_jobs(jobs, rundeck) for project_name, jobs in projects_jobs.items() }
-    #information_jobs = { 'project': project_name, 'jobs': get_information_jobs(jobs, rundeck) for project_name, jobs in projects_jobs.items() }
 
     for project_name, info_jobs in information_jobs.items():
         print("projeto: %s" % project_name)
